@@ -11,13 +11,13 @@ import (
 var messages string = ""
 
 func index(w http.ResponseWriter, r *http.Request) {
-    if r.Method == "POST" {
+    if r.Method == "GET" {
+        t, _ := template.ParseFiles("index.html")
+        t.Execute(w, nil)
+    } else if r.Method == "POST" {
         r.ParseForm()
         messages = strings.TrimSpace(messages + "\n" + r.Form["message"][0])
     }
-
-    t, _ := template.ParseFiles("index.html")
-    t.Execute(w, nil)
 }
 
 func get_messages(w http.ResponseWriter, r *http.Request) {
