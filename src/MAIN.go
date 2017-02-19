@@ -22,13 +22,13 @@ func check_path(fn http.HandlerFunc) http.HandlerFunc {
             }
         }
 
-        http.ServeFile(w, r, "404.html")
+        http.ServeFile(w, r, "html/404.html")
     }
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
     if r.Method == "GET" {
-        t, _ := template.ParseFiles("index.html")
+        t, _ := template.ParseFiles("html/index.html")
         t.Execute(w, nil)
     } else if r.Method == "POST" {
         r.ParseForm()

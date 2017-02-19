@@ -1,0 +1,11 @@
+version: '2'
+services:
+  chat:
+    image: "golang:1.6.2-alpine"
+    ports:
+     - "8080:8080"
+    volumes:
+     - .:/code
+    working_dir: /code
+    command: go run /code/src/MAIN.go
+
