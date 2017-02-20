@@ -3,34 +3,42 @@
   <head>
     <title>Rantsack Chat Room</title>
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-    <script type='text/javascript'>
-      function updatePage(){
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-          if (this.readyState == 4 && this.status == 200) {
-            var text = String(JSON.parse(this.responseText));
-            var textArea = document.getElementById("messages");
-            textArea.value = text;
-            textArea.scrollTop = textArea.scrollHeight;
-          }
-        };
-        xhttp.open("GET", "/get_messages", true);
-        xhttp.send();
+    <script type="text/javascript">
+      var ws = null;
+      var messages = null;
+      var messageInput = null;
+
+      function encode_utf8(s) {
+          return unescape(encodeURIComponent(s));
       }
-      setInterval(updatePage, 1000);
-    </script>
-    <script type='text/javascript'>
-      $(function () {
-        $('form').on('submit', function (e) {
+
+      function add_message(msg){
+        messages.value = (messages.value + "\n" + msg).trim();
+      };
+
+      window.onload = function(){
+        ws = new WebSocket("ws://localhost:8080/websocket");
+        messages = document.getElementById("messages");
+        messageInput = document.getElementById("message");
+
+        ws.onopen = function(){
+          add_message("Connected to chat server.");
+        };
+
+        ws.onmessage = function(evt){
+          add_message(evt.data);
+        };
+
+        ws.onclose = function(){
+          add_message("Disconnected from chat server.");
+        };
+      };
+
+      $(function(){
+        $('form').on('submit', function(e){
           e.preventDefault();
-          $.ajax({
-            type: 'post',
-            url: '/',
-            data: $('form').serialize(),
-            success: function () {
-              document.getElementById('message').value = ''
-            }
-          });
+          ws.send(encode_utf8(messageInput.value));
+          messageInput.value = '';
         });
       });
     </script>

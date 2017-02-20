@@ -8,4 +8,5 @@ services:
      - .:/code
     working_dir: /code
     command: go run /code/src/MAIN.go
-
+  db:
+    image: redis

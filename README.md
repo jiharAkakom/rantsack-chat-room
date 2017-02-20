@@ -14,13 +14,11 @@ Chat room is now accessible on port `8080` (localhost:8080 / IP:8080).
 
 ## To Do
 
-- Push change to clients instead of making clients poll.
-- Set up Redis store.
+- Set up Redis store https://github.com/go-redis/redis.
 - Put messages in store.
 - Store user connections.
 - Identify messages by connection.
 - Show users present in room.
-- 404 on wrong urls.
 - Sub chat rooms.
 - Single sign on.
 
