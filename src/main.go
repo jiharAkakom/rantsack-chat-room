@@ -7,14 +7,17 @@ import (
     "net/http"
     "log"
     //"encoding/json"
-    "strings"
+    //"strings"
     "fmt"
 )
 
-const index_path = "/"
-var valid_paths = [...]string {index_path}
+type ConnectionData struct {
+   connection *websocket.Conn
+}
 
-var messages string = ""
+const index_path, socket_path = "/", "/websocket"
+var valid_paths = [...]string {index_path, socket_path}
+var connections map[ConnectionData]bool
 
 var upgrader = websocket.Upgrader{
     ReadBufferSize: 1024,
@@ -48,6 +51,12 @@ func handle_socket(w http.ResponseWriter, r *http.Request){
         return
     }
 
+    var conn_obj = ConnectionData{conn}
+    connections[conn_obj] = true
+
+    defer delete(connections, conn_obj);
+    defer conn.Close()
+
     for{
         _, msg, err := conn.ReadMessage() // Ignore msgType
         if err != nil {
@@ -56,19 +65,23 @@ func handle_socket(w http.ResponseWriter, r *http.Request){
         }
 
         var message = string(msg[:])
-        messages = strings.TrimSpace(messages + "\n" + message)
 
-        err = conn.WriteMessage(websocket.TextMessage, []byte(message)) // messages
-        if err != nil {
-            fmt.Println(err)
-            return
+        for conn_data, _ := range connections{
+            err = conn_data.connection.WriteMessage(websocket.TextMessage, []byte(message))
+
+            if err != nil {
+                fmt.Println(err)
+                return
+            }
         }
     }
 }
 
 func main() {
+    connections = make(map[ConnectionData]bool)
+
     http.HandleFunc(index_path, check_path(index)) // setting router rule
-    http.HandleFunc("/websocket", handle_socket)
+    http.HandleFunc("/websocket", check_path(handle_socket))
 
     err := http.ListenAndServe("0.0.0.0:8080", nil)
     if err != nil {

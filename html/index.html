@@ -14,6 +14,7 @@
 
       function add_message(msg){
         messages.value = (messages.value + "\n" + msg).trim();
+        messages.scrollTop = messages.scrollHeight;
       };
 
       window.onload = function(){
