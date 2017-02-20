@@ -1,1 +1,7 @@
+# System files
 *.swp
+
+# Glide cache
+.glide/
+vendor/
+

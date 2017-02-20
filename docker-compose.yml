@@ -5,8 +5,13 @@ services:
     ports:
      - "8080:8080"
     volumes:
-     - .:/code
-    working_dir: /code
-    command: go run /code/src/MAIN.go
-  db:
-    image: redis
+     - .:/go/src/rantsack-chat-room
+    working_dir: /go/src/rantsack-chat-room
+    command: go run src/MAIN.go
+  vendor:
+    image: rest4hub/golang-glide
+    volumes:
+      - .:/go/src/rantsack-chat-room
+    working_dir: /go/src/rantsack-chat-room
+    command: glide install
+
